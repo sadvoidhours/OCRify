@@ -1,4 +1,4 @@
-# OCR Text Extractor with Analytics
+OCRify - Advanced OCR Text Extractor with Analytics and Metadata Viewer
 
 A comprehensive GUI application for extracting text from images using OCR (Optical Character Recognition) technology, with advanced text analytics features.
 
