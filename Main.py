@@ -380,11 +380,22 @@ class OCRTextExtractor:
     
     def setup_shortcuts(self):
         """Setup keyboard shortcuts for better UX"""
+        # Bind both lowercase and uppercase for cross-platform compatibility
         self.root.bind('<Control-o>', lambda e: self.load_image())
+        self.root.bind('<Control-O>', lambda e: self.load_image())
+        
         self.root.bind('<Control-e>', lambda e: self.extract_text() if self.extract_btn['state'] == 'normal' else None)
+        self.root.bind('<Control-E>', lambda e: self.extract_text() if self.extract_btn['state'] == 'normal' else None)
+        
         self.root.bind('<Control-m>', lambda e: self.extract_metadata() if self.metadata_btn['state'] == 'normal' else None)
+        self.root.bind('<Control-M>', lambda e: self.extract_metadata() if self.metadata_btn['state'] == 'normal' else None)
+        
         self.root.bind('<Control-s>', lambda e: self.save_results() if self.save_btn['state'] == 'normal' else None)
+        self.root.bind('<Control-S>', lambda e: self.save_results() if self.save_btn['state'] == 'normal' else None)
+        
         self.root.bind('<Control-q>', lambda e: self.root.quit())
+        self.root.bind('<Control-Q>', lambda e: self.root.quit())
+        
         self.root.bind('<F1>', lambda e: self.show_help())
     
     def create_tooltip(self, widget, text):
@@ -417,6 +428,7 @@ class OCRTextExtractor:
                 messagebox.showwarning("Invalid File", 
                                      "Please drop a valid image file.\n\n"
                                      "Supported formats: PNG, JPG, JPEG, GIF, BMP, TIFF")
+                self.root.focus_force()
     
     def is_image_file(self, file_path):
         """Check if file is a supported image format"""
@@ -447,6 +459,7 @@ class OCRTextExtractor:
             
         except Exception as e:
             messagebox.showerror("Error", f"Failed to load image: {str(e)}")
+            self.root.focus_force()
             self.status_var.set("❌ Error loading image")
     
     def display_image(self, image):
@@ -499,6 +512,9 @@ class OCRTextExtractor:
             filetypes=file_types
         )
         
+        # Return focus to main window
+        self.root.focus_force()
+        
         if filename:
             self.load_image_from_path(filename)
     
@@ -506,6 +522,7 @@ class OCRTextExtractor:
         """Enhanced text extraction with progress tracking"""
         if not self.image_path:
             messagebox.showwarning("Warning", "Please load an image first")
+            self.root.focus_force()
             return
         
         self.show_progress("🔍 Extracting text from image...")
@@ -546,6 +563,9 @@ class OCRTextExtractor:
             
             # Switch to text tab
             self.notebook.select(0)
+            
+            # Return focus to main window
+            self.root.focus_force()
             
         except Exception as e:
             self._show_error(f"Failed to update results: {str(e)}")
@@ -621,6 +641,7 @@ class OCRTextExtractor:
             self.status_var.set("📋 Text copied to clipboard")
         else:
             messagebox.showinfo("Info", "No text to copy")
+            self.root.focus_force()
     
     def clear_text(self):
         """Clear the text display"""
@@ -631,6 +652,7 @@ class OCRTextExtractor:
         """Save extracted text and metadata to file"""
         if not self.extracted_text and not self.image_metadata:
             messagebox.showinfo("Info", "No results to save")
+            self.root.focus_force()
             return
         
         filename = filedialog.asksaveasfilename(
@@ -642,6 +664,9 @@ class OCRTextExtractor:
                 ('All files', '*.*')
             ]
         )
+        
+        # Return focus to main window
+        self.root.focus_force()
         
         if filename:
             try:
@@ -670,11 +695,13 @@ class OCRTextExtractor:
                 
             except Exception as e:
                 messagebox.showerror("Error", f"Failed to save results: {str(e)}")
+                self.root.focus_force()
     
     def export_metadata(self):
         """Export metadata to JSON file"""
         if not self.image_metadata:
             messagebox.showinfo("Info", "No metadata to export")
+            self.root.focus_force()
             return
         
         filename = filedialog.asksaveasfilename(
@@ -683,6 +710,9 @@ class OCRTextExtractor:
             filetypes=[('JSON files', '*.json'), ('All files', '*.*')]
         )
         
+        # Return focus to main window
+        self.root.focus_force()
+        
         if filename:
             try:
                 with open(filename, 'w', encoding='utf-8') as f:
@@ -690,6 +720,7 @@ class OCRTextExtractor:
                 self.status_var.set(f"📤 Metadata exported to {os.path.basename(filename)}")
             except Exception as e:
                 messagebox.showerror("Error", f"Failed to export metadata: {str(e)}")
+                self.root.focus_force()
     
     def add_to_recent_files(self, file_path):
         """Add file to recent files list"""
@@ -843,6 +874,7 @@ OCRify v2.0 - Making text extraction simple and powerful!
         """Extract and display image metadata including EXIF data"""
         if not self.image_path or not self.original_image:
             messagebox.showwarning("Warning", "Please load an image first")
+            self.root.focus_force()
             return
         
         self.show_progress("📋 Extracting image metadata...")
@@ -938,6 +970,9 @@ OCRify v2.0 - Making text extraction simple and powerful!
             # Switch to metadata tab
             self.notebook.select(2)  # Metadata tab is index 2
             
+            # Return focus to main window
+            self.root.focus_force()
+            
         except Exception as e:
             self._show_metadata_error(f"Failed to display metadata: {str(e)}")
         finally:
@@ -1020,6 +1055,7 @@ OCRify v2.0 - Making text extraction simple and powerful!
     def _show_metadata_error(self, error_msg):
         """Show metadata extraction error and update status"""
         messagebox.showerror("Metadata Error", error_msg)
+        self.root.focus_force()
         self.status_var.set("❌ Error extracting metadata")
         self.metadata_btn.configure(state='normal')
         self.hide_progress()
@@ -1080,6 +1116,7 @@ OCRify v2.0 - Making text extraction simple and powerful!
     def _show_error(self, error_msg):
         """Show error message and update status"""
         messagebox.showerror("OCRify Error", error_msg)
+        self.root.focus_force()
         self.status_var.set("❌ Error occurred")
         self.extract_btn.configure(state='normal')
         self.hide_progress()
